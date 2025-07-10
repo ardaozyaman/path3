@@ -13,8 +13,8 @@ pipeline {
         // 3. Adım: Kodu Çekme
         stage('Checkout') {
             steps {
-                // Projenizin bulunduğu Git deposunun adresini buraya yazın.
-                git 'https://github.com/ardaozyaman/path3.git'
+                // Hangi dalın (branch) kullanılacağını belirtiyoruz.
+                git branch: 'main', url: 'https://github.com/ardaozyaman/path3.git'
             }
         }
 
