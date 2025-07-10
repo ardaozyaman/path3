@@ -15,6 +15,7 @@ def insert_test_result(test_name: str, status: str, duration: float):
     db: Session = SessionLocal()
     try:
         test_result = TestResult(
+            
             test_name=test_name,
             status=status,
             duration=duration,
