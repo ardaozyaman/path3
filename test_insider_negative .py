@@ -8,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import os
 
 class InsiderCareersTest(unittest.TestCase):
-    driver = None  # Sınıf seviyesinde driver tanımı test
+    driver = None  # Sınıf seviyesinde driver tanımı
 
     @classmethod
     def setUpClass(cls):
