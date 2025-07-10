@@ -14,7 +14,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Projenizin bulunduğu Git deposunun adresini buraya yazın.
-                git 'https://github.com/kullanici-adiniz/proje-repo.git'
+                git 'https://github.com/ardaozyaman/path3.git'
             }
         }
 
