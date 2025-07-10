@@ -1,6 +1,8 @@
 import unittest
 import time
+import os
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -8,7 +10,35 @@ from db_operations import insert_test_result
 
 class SearchTest(unittest.TestCase):
     def setUp(self):
-        self.driver = webdriver.Chrome()
+        # Chrome/Chromium için headless ve diğer Jenkins ayarları
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--window-size=1920,1080')
+        
+        # Jenkins agent'ındaki Chromium tarayıcısının yolunu belirt
+        # Eğer bu yolda değilse, agent'taki doğru yolu yazmalısınız.
+        if os.path.exists('/usr/bin/chromium-browser'):
+            options.binary_location = '/usr/bin/chromium-browser'
+        elif os.path.exists('/usr/bin/chromium'):
+            options.binary_location = '/usr/bin/chromium'
+
+        # Jenkins agent'ındaki ChromeDriver'ın olası yollarını bul
+        chromedriver_path = None
+        possible_paths = ['/usr/lib/chromium/chromedriver', '/usr/bin/chromedriver', '/usr/lib/chromium-browser/chromedriver']
+        for path in possible_paths:
+            if os.path.exists(path):
+                chromedriver_path = path
+                break
+        
+        if not chromedriver_path:
+            raise RuntimeError('ChromeDriver sistemde bulunamadı. Lütfen Jenkins agentını kontrol edin.')
+
+        # WebDriver'ı, bulunan sürücü yolu ve seçeneklerle başlat
+        service = Service(executable_path=chromedriver_path)
+        self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.implicitly_wait(10)
 
     def test_search_in_duckduckgo(self):
