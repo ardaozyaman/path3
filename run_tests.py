@@ -1,65 +1,51 @@
 import unittest
 import time
 import sys
-from models import init_db
-from db_operations import insert_test_result
+from db_operations import insert_test_result, init_db
 
 class DatabaseTestResult(unittest.TextTestResult):
+    """
+    unittest sonuçlarını yakalayıp veritabanına kaydeden özel TestResult sınıfı.
+    """
     def startTest(self, test):
-        super().startTest(test)
         self.start_time = time.time()
+        super().startTest(test)
+        print(f"Running test: {test.id()} ... ", end="")
 
     def addSuccess(self, test):
         super().addSuccess(test)
         duration = time.time() - self.start_time
         insert_test_result(test.id(), 'pass', duration)
-        print(f"PASS: {test.id()} ({duration:.4f}s)")
+        print("PASS")
 
     def addFailure(self, test, err):
         super().addFailure(test, err)
         duration = time.time() - self.start_time
         insert_test_result(test.id(), 'fail', duration)
-        print(f"FAIL: {test.id()} ({duration:.4f}s)")
+        print("FAIL")
 
     def addError(self, test, err):
         super().addError(test, err)
         duration = time.time() - self.start_time
-        # Errors are also considered failures in test outcomes
+        # Hataları da 'fail' olarak kaydediyoruz.
         insert_test_result(test.id(), 'fail', duration)
-        print(f"ERROR: {test.id()} ({duration:.4f}s)")
-
-class DatabaseTestRunner(unittest.TextTestRunner):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, resultclass=DatabaseTestResult, **kwargs)
-
-def run_tests():
-    """
-    Discovers and runs all tests, recording results to the database.
-    """
-    # Initialize the database and create tables if they don't exist
-    print("Initializing database...")
-    init_db()
-    print("Database initialized.")
-
-    # Discover and run tests
-    print("Discovering tests...")
-    loader = unittest.TestLoader()
-    suite = loader.discover(start_dir='.', pattern='test_*.py')
-    
-    if suite.countTestCases() == 0:
-        print("No tests found.")
-        return True
-
-    print(f"Found {suite.countTestCases()} tests.")
-    
-    runner = DatabaseTestRunner(verbosity=2)
-    result = runner.run(suite)
-
-    # Return True if the test run was successful, False otherwise
-    return result.wasSuccessful()
+        print("ERROR")
 
 if __name__ == "__main__":
-    success = run_tests()
-    # Exit with a status code that reflects the test outcome
-    # This is important for CI/CD systems like Jenkins
-    sys.exit(0 if success else 1)
+    # Veritabanı ve tabloyu başlat/kontrol et
+    init_db()
+
+    # Proje dizinindeki 'test_' ile başlayan tüm testleri bul
+    loader = unittest.TestLoader()
+    suite = loader.discover(start_dir='.', pattern='test_*.py')
+
+    # Özel TestResult sınıfımızı kullanan bir runner oluştur
+    runner = unittest.TextTestRunner(resultclass=DatabaseTestResult)
+    
+    # Testleri çalıştır
+    result = runner.run(suite)
+
+    # Jenkins'in pipeline durumunu belirlemesi için çıkış kodu ayarla
+    # Eğer herhangi bir test başarısız olduysa veya hata verdiyse, çıkış kodu 1 olacak.
+    if not result.wasSuccessful():
+        sys.exit(1)
