@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from models import Base
 
 # .env dosyasını yükle (eğer varsa, lokal geliştirme için)
@@ -24,3 +23,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def init_db():
+    """
+    Veritabanı tablolarını (eğer mevcut değilse) oluşturur.
+    """
+    Base.metadata.create_all(bind=engine)

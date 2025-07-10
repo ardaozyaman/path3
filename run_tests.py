@@ -1,7 +1,8 @@
 import unittest
 import time
 import sys
-from db_operations import insert_test_result, init_db
+from db_operations import insert_test_result
+from database import init_db
 
 class DatabaseTestResult(unittest.TextTestResult):
     """
