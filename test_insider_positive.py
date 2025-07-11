@@ -9,6 +9,7 @@ import os
 
 class InsiderCareersTest(unittest.TestCase):
     driver = None  # Sınıf seviyesinde driver tanımı
+    "test commit"
 
     @classmethod
     def setUpClass(cls):
