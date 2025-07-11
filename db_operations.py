@@ -6,7 +6,7 @@ from datetime import datetime
 def insert_test_result(test_name: str, status: str, duration: float):
     """
     Inserts a test result into the database.
-
+    buddy
     Args:
         test_name (str): The name of the test method.
         status (str): The result of the test ('pass' or 'fail').
