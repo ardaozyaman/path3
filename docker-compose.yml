@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  jenkins:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - ./:/var/jenkins_home/workspace/cicd_demo:rw
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+volumes:
+  jenkins_home:
